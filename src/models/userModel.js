@@ -3,10 +3,11 @@ const prisma = new PrismaClient();
 
 const UserModel = {
     findByUserName: (username) => prisma.user.findUnique({ where: { username } }),
+    findByEmail: (email) => prisma.user.findUnique({ where: { email } }),
     findById: (id) => prisma.user.findUnique({ where: { id } }),
-    create: (username, password) =>
+    create: (username, email, password) =>
         prisma.user.create({
-            data: { username, password },
+            data: { username, email, password },
         }),
 }
 

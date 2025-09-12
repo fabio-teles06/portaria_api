@@ -1,14 +1,25 @@
 datasource db {
-  provider = "sqlite" // ou "postgresql" / "mysql"
-  url      = "file:./dev.db"
+  provider = "postgresql" // ou "postgresql" / "mysql"
+  url      = env("DATABASE_URL")
 }
 
 generator client {
   provider = "prisma-client-js"
 }
 
+model tipo_usuario {
+  id   Int    @id @default(autoincrement())
+  tipo String @unique
+
+  users User[]
+}
+
 model User {
   id       Int    @id @default(autoincrement())
-  username String @unique
+  username String
+  email    String @unique
   password String
+
+  tipo_usuario_id Int
+  tipo_usuario    tipo_usuario @relation(fields: [tipo_usuario_id], references: [id])
 }
