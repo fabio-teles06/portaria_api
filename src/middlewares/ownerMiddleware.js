@@ -1,20 +1,27 @@
-const OwnerModel = require('../models/OwnerModel');
+const jwt = require("jsonwebtoken");
+const OwnerModel = require("../models/OwnerModel");
 
-function authMiddleware(req, res, next) {
-  const user = req.user;
+module.exports = (req, res, next) => {
+  const { token, condominiumId } = req.body;
+  if (!token) {
+    return res.status(401).json({ message: "Token not found" });
+  }
 
-  OwnerModel.getByUser(user.id)
-    .then(owner => {
-      if (!owner) {
-        return res.status(403).json({ error: 'Access denied' });
+  const user = jwt.decode(token, process.env.JWT_SECRET);
+  if (!user) {
+    return res.status(401).json({ message: "Invalid token" });
+  }
+
+  OwnerModel.isOwner(user.id, condominiumId)
+    .then((isOwner) => {
+      if (!isOwner) {
+        return res.status(403).json({ message: "Access denied" });
       }
-      req.owner = owner;
       next();
     })
-    .catch(err => {
-      console.error(err);
-      res.status(500).json({ error: 'Internal server error' });
+    .catch((error) => {
+      return res
+        .status(500)
+        .json({ message: "Internal server error", error: error.message });
     });
-}
-
-module.exports = authMiddleware;
+};

@@ -2,14 +2,24 @@ const { prismaClient, PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 
 const OwnerModel = {
-    findById: async (id) => prisma.owner.findUnique({ where: { id } }),
-    getByUser: async (userId) => prisma.owner.findUnique({ where: { userId } }),
-    getByCondominium: async (condominiumId) => prisma.owner.findMany({ where: { condominiumId } }),
-    create: async (userId, condominiumId) => {
-        return prisma.owner.create({
-            data: { userId, condominiumId },
-        })
-    }
-}
+  findByUser: async (userId) => {
+    return await prisma.owner.findMany({
+      where: { userId },
+      select: {
+        id: false,
+        userId: false,
+        condominium: true
+      },
+    });
+  },
+  isOwner: async (userId, condominiumId) => {
+    return prisma.owner.count({
+      where: {
+        userId,
+        condominiumId
+      }
+    }) > 0;
+  }
+};
 
 module.exports = OwnerModel;

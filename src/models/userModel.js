@@ -2,13 +2,16 @@ const { prismaClient, PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 
 const UserModel = {
-    findByUserName: async (username) => prisma.user.findUnique({ where: { username } }),
-    findByEmail: async (email) => prisma.user.findUnique({ where: { email } }),
-    findById: async (id) => prisma.user.findUnique({ where: { id } }),
-    create: async (username, email, password) =>
-        prisma.user.create({
-            data: { username, email, password },
-        }),
-}
+  findByEmail: async (email) => {
+    return await prisma.user.findUnique({
+      where: { email },
+    });
+  },
+  create: async (data) => {
+    return await prisma.user.create({
+      data,
+    });
+  },
+};
 
 module.exports = UserModel;

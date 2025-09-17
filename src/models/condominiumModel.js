@@ -2,20 +2,16 @@ const { prismaClient, PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 
 const CondominiumModel = {
-    findById: async (id) => prisma.owner.findUnique({ where: { id } }),
-    create: async (
-        name,
-        address
-    ) => {
-        const condominium = await prisma.condominium.create({
-            data: {
-                name,
-                address
-            }
-        });
-
-        return condominium;
-    }
-}
+  getById: async (id) => {
+    return await prisma.condominium.findUnique({
+      where: { id },
+    });
+  },
+  create : async (data) => {
+    return await prisma.condominium.create({
+      data
+    });
+  }
+};
 
 module.exports = CondominiumModel;
