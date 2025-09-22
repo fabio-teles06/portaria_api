@@ -1,21 +1,22 @@
-const { prisma } = require("../lib/prisma");
+import { User } from "@prisma/client";
+import { prisma } from "../lib/prisma";
 
 const UserModel = {
-  async create(data) {
+  async create(data: User) {
     return await prisma.user.create({ data });
   },
   async findAll() {
     return await prisma.user.findMany();
   },
-  async findById(id) {
+  async findById(id: number) {
     return await prisma.user.findUnique({ where: { id } });
   },
-  async update(id, data) {
+  async update(id: number, data: User) {
     return await prisma.user.update({ where: { id }, data });
   },
-  async delete(id) {
+  async delete(id: number) {
     return await prisma.user.delete({ where: { id } });
   },
 };
 
-module.exports = UserModel;
+export default UserModel;
