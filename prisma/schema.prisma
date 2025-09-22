@@ -7,60 +7,28 @@ generator client {
   provider = "prisma-client-js"
 }
 
+enum ROLE {
+  RESIDENT
+  DOORMAN
+  ADMIN
+}
+
+model Tenant {
+  id        Int      @id @default(autoincrement())
+  name      String
+  address   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
 model User {
-  id       Int    @id @default(autoincrement())
-  username String
-  email    String @unique
-  password String
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  password  String
+  role      ROLE     @default(RESIDENT)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  Resident Resident[]
-  Owner    Owner[]
+  tenantId Int /// @where-required
 }
 
-model Condominium {
-  id      Int    @id @default(autoincrement())
-  name    String
-  address String
-
-  owners     Owner[]
-  properties Property[]
-  Doorman    Doorman[]
-}
-
-model Owner {
-  id            Int @id @default(autoincrement())
-  userId        Int @unique
-  condominiumId Int @unique
-
-  user        User        @relation(fields: [userId], references: [id])
-  condominium Condominium @relation(fields: [condominiumId], references: [id])
-}
-
-model Property {
-  id            Int    @id @default(autoincrement())
-  unitNumber    String
-  floor         Int
-  condominiumId Int
-
-  condominium Condominium @relation(fields: [condominiumId], references: [id])
-
-  residents Resident[]
-}
-
-model Resident {
-  id         Int @id @default(autoincrement())
-  userId     Int
-  propertyId Int
-
-  user     User     @relation(fields: [userId], references: [id])
-  property Property @relation(fields: [propertyId], references: [id])
-}
-
-model Doorman {
-  id            Int    @id @default(autoincrement())
-  name          String
-  shift         String
-  condominiumId Int
-
-  condominium Condominium @relation(fields: [condominiumId], references: [id])
-}

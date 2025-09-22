@@ -17,7 +17,6 @@ const AuthController = {
         return res.status(401).json({ message: "Invalid email or password" });
       }
 
-
       const owner = await OwnerModel.findByUser(user.id);
       const resident = await ResidentModel.findByUser(user.id);
 
@@ -53,6 +52,9 @@ const AuthController = {
     } catch (error) {
       res.status(500).json({ message: "Server error", error: error.message });
     }
+  },
+  async createAccount(req, res) {
+    const { username, email, password, role } = req.body;
   },
 };
 

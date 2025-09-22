@@ -4,20 +4,12 @@
   "description": "",
   "main": "src/server.js",
   "scripts": {
-    "dev": "nodemon src/server.js",
-    "start": "node src/server.js",
-    "prisma:migrate": "prisma migrate dev",
+    "dev": "nodemon --watch src --exec ts-node src/server.ts",
+    "build": "tsc",
+    "start": "node dist/server.js",
     "prisma:generate": "prisma generate",
-    "prisma:studio": "prisma studio"
+    "prisma:migrate": "prisma migrate dev"
   },
-  "keywords": [
-    "nodejs",
-    "express",
-    "prisma",
-    "authentication",
-    "jwt",
-    "mvc"
-  ],
   "author": "fabio-teles06",
   "license": "CC0-1.0",
   "dependencies": {
@@ -28,7 +20,10 @@
     "jsonwebtoken": "^9.0.2"
   },
   "devDependencies": {
+    "@types/express": "^5.0.3",
+    "@types/node": "^24.5.2",
     "nodemon": "^3.0.2",
-    "prisma": "^6.16.1"
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.2"
   }
 }
