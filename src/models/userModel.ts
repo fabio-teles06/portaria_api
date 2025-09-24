@@ -7,6 +7,8 @@ const UserModel = {
     password: string;
     tenantId: number;
     role: ROLE;
+    firstAccess: boolean;
+    personId: number;
   }) {
     return await prisma.user.create({ data });
   },

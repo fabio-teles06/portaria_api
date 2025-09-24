@@ -12,6 +12,10 @@ enum ROLE {
   DOORMAN
   ADMIN
 }
+enum EntryExitType {
+  ENTRY
+  EXIT
+}
 
 model Tenant {
   id        Int      @id @default(autoincrement())
@@ -21,6 +25,7 @@ model Tenant {
   updatedAt DateTime @updatedAt
 
   users     User[]
+  entryExits EntryExit[]
 }
 
 model User {
@@ -28,10 +33,41 @@ model User {
   email     String   @unique
   password  String
   role      ROLE     @default(RESIDENT)
+
+  firstAccess Boolean  @default(true)
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  personId  Int
   tenantId  Int
+  person    Person   @relation(fields: [personId], references: [id])
   tenant    Tenant   @relation(fields: [tenantId], references: [id])
 }
 
+model Person {
+  id        Int      @id @default(autoincrement())
+  name      String
+  cpf       String
+  phone     String
+  tenantId  Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([cpf, tenantId])
+
+  users     User[]
+  entryExits EntryExit[]
+}
+
+//controle de entrada e saida
+model EntryExit {
+  id          Int      @id @default(autoincrement())
+  personId    Int
+  tenantId    Int
+  type        EntryExitType
+  createdAt   DateTime @default(now())
+
+  person      Person   @relation(fields: [personId], references: [id])
+  tenant      Tenant   @relation(fields: [tenantId], references: [id])
+}
