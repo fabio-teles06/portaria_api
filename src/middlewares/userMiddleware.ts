@@ -12,20 +12,20 @@ declare global {
 }
 
 const UserMiddleware = (req: Request, res: Response, next: NextFunction) => {
-  const authHeader = req.headers.authorization;
-  if (!authHeader) {
+  const token = req.headers.authorization;
+  if (!token) {
     return res
       .status(401)
       .json({ result: false, message: "No token provided" });
   }
-  const token = authHeader.split(" ")[1];
   jwt.verify(token, process.env.JWT_SECRET as string, (err, decoded) => {
     if (err) {
       return res.status(401).json({ result: false, message: "Token invalid" });
     }
 
-    req.user = decoded;
-    req.tenantId = (decoded as any).tenantId;
+    var user = (decoded as any).user;
+    req.user = user;
+    req.tenantId = user.tenantId;
     next();
   });
 };

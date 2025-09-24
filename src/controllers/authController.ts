@@ -16,6 +16,9 @@ const AuthController = {
 
     //zod validation can be added heres\
     const createAccountSchema = z.object({
+      name: z.string().min(1),
+      cpf: z.string().min(11).max(14),
+      phone: z.string().min(10).max(15),
       email: z.email(),
       password: z.string().min(6),
       name_condominium: z.string().min(1),
@@ -59,7 +62,9 @@ const AuthController = {
       });
       return res.status(201).json({ result: true, message: "Account created" });
     } catch (error) {
-      return res.status(500).json({ result: false, message: "Server error" });
+      return res
+        .status(500)
+        .json({ result: false, message: "Server error", error });
     }
   },
   async login(req: Request, res: Response) {
@@ -92,11 +97,7 @@ const AuthController = {
           .status(400)
           .json({ result: false, message: "Invalid credentials" });
       }
-      const token = jwt.sign(
-        { userId: user.id, tenantId: user.tenantId },
-        JWT_SECRET,
-        { expiresIn: "24h" }
-      );
+      const token = jwt.sign({ user }, JWT_SECRET, { expiresIn: "24h" });
       return res.status(200).json({ result: true, token });
     } catch (error) {
       return res.status(500).json({ result: false, message: "Server error" });

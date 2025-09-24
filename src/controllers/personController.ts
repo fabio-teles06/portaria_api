@@ -59,7 +59,14 @@ const PersonController = {
       ).toString();
       const hashedPassword = await bcrypt.hash(randomNumber, 10);
 
-      await UserModel.create({
+      const existingUser = await UserModel.findByEmail(email);
+      if (existingUser) {
+        return res
+          .status(400)
+          .json({ result: false, error: "Email already in use" });
+      }
+
+      const user = await UserModel.create({
         email,
         password: hashedPassword,
         role: ROLE.RESIDENT,
@@ -68,7 +75,19 @@ const PersonController = {
         firstAccess: true,
       });
 
-      res.status(200).json({ result: true, person });
+      res.status(200).json({ result: true, user });
+    } catch (error) {
+      res.status(500).json({ result: false, error: "Internal server error" });
+    }
+  },
+  async getUser(req: Request, res: Response) {
+    const personId = req.params.id;
+    try {
+      const user = await UserModel.findByPersonId(Number(personId));
+      if (!user) {
+        return res.status(404).json({ result: false, error: "User not found" });
+      }
+      res.status(200).json({ result: true, user });
     } catch (error) {
       res.status(500).json({ result: false, error: "Internal server error" });
     }

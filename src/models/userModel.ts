@@ -21,6 +21,9 @@ const UserModel = {
   async findByEmail(email: string) {
     return await prisma.user.findUnique({ where: { email } });
   },
+  async findByPersonId(personId: number) {
+    return await prisma.user.findFirst({ where: { personId } });
+  },
   async update(id: number, data: User) {
     return await prisma.user.update({ where: { id }, data });
   },

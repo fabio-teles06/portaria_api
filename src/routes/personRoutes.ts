@@ -10,5 +10,6 @@ PersonRoutes.use(AdminMiddleware);
 
 PersonRoutes.post("/", PersonController.create);
 PersonRoutes.post("/:id/user", PersonController.addUser);
+PersonRoutes.get("/:id/user", PersonController.getUser);
 
 export default PersonRoutes;
