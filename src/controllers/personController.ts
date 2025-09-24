@@ -84,9 +84,14 @@ const PersonController = {
     const personId = req.params.id;
     try {
       const user = await UserModel.findByPersonId(Number(personId));
+      
       if (!user) {
         return res.status(404).json({ result: false, error: "User not found" });
       }
+
+      // Exclude password from the response
+      delete (user as any).password;
+
       res.status(200).json({ result: true, user });
     } catch (error) {
       res.status(500).json({ result: false, error: "Internal server error" });
