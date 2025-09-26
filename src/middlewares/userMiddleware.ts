@@ -1,11 +1,18 @@
+import { ROLE } from "@prisma/client";
 import { NextFunction, Request, Response } from "express";
 import * as jwt from "jsonwebtoken";
 
-// request.user and request.tenantId will be available
+interface AuthUser {
+  id: number;
+  email: string;
+  role: ROLE;
+  // outros campos que você salvar no token
+}
+
 declare global {
   namespace Express {
     interface Request {
-      user?: string | object;
+      user?: AuthUser | null;
       tenantId?: number;
     }
   }

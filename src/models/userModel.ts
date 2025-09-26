@@ -12,8 +12,8 @@ const UserModel = {
   }) {
     return await prisma.user.create({ data });
   },
-  async findAll() {
-    return await prisma.user.findMany();
+  async findAll(tenantId: number) {
+    return await prisma.user.findMany({ where: { tenantId } });
   },
   async findById(id: number) {
     return await prisma.user.findUnique({ where: { id } });

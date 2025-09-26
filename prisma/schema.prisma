@@ -10,6 +10,8 @@ generator client {
 enum ROLE {
   RESIDENT
   DOORMAN
+  MANAGER
+  OWNER
   ADMIN
 }
 enum EntryExitType {
@@ -48,13 +50,10 @@ model User {
 model Person {
   id        Int      @id @default(autoincrement())
   name      String
-  cpf       String
+  cpf       String @unique
   phone     String
-  tenantId  Int
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-
-  @@unique([cpf, tenantId])
 
   users     User[]
   entryExits EntryExit[]
