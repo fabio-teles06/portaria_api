@@ -25,3 +25,5 @@ const CondominiumController = {
     }
   },
 };
+
+export default CondominiumController;
