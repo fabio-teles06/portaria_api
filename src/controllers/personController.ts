@@ -1,47 +1,27 @@
-import { Request, Response } from "express";
-import { error } from "console";
-import { z } from "zod";
 import PersonModel from "../models/personModel";
+import { Request, Response } from "express";
+import z from "zod";
 
 const createPersonSchema = z.object({
-  name: z.string().min(1),
-  cpf: z.string().min(11).max(14),
-  phone: z.string().min(10).max(15),
-});
-
-const findPersonSchema = z.object({
-  cpf: z.string().min(11).max(14),
+  name: z.string().min(1, "Name is required"),
+  phone: z.string().min(1, "Phone number is required"),
+  contact: z.string().min(1, "Contact is required"),
+  cpf: z.string().min(1, "CPF is required"),
 });
 
 const PersonController = {
-  //Para cadastro de pessoas
-  async create(req: Request, res: Response) {
+  create: async (req: Request, res: Response) => {
     try {
-      const { name, cpf, phone } = createPersonSchema.parse(req.body);
-      const person = await PersonModel.create({ name, cpf, phone });
-      res.status(201).json({ result: true, person });
+      const parsedData = createPersonSchema.parse(req.body);
+      const person = await PersonModel.create(parsedData);
+      res.status(201).json(person);
     } catch (error) {
-      res
-        .status(500)
-        .json({ result: false, message: "Internal server error", error });
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ errors: error.issues });
+      }
+      res.status(500).json({ error: "Internal server error" });
     }
   },
-  async find(req: Request, res: Response) {
-    try {
-      const { cpf } = findPersonSchema.parse(req.body);
-      const person = await PersonModel.findByCpf(cpf);
-      if (!person)
-        res
-          .status(404)
-          .json({ result: false, message: "Person not found", error });
-
-      res.status(200).json(person);
-    } catch (error) {
-      res
-        .status(500)
-        .json({ result: false, message: "Internal server error", error });
-    }
-  }
 };
 
 export default PersonController;

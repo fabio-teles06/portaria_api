@@ -13,9 +13,5 @@ PersonRoutes.post(
   RoleMiddleware([ROLE.ADMIN, ROLE.MANAGER]),
   PersonController.create
 );
-PersonRoutes.get("/",
-  RoleMiddleware([ROLE.ADMIN, ROLE.MANAGER, ROLE.DOORMAN]),
-  PersonController.find
-);
 
 export default PersonRoutes;

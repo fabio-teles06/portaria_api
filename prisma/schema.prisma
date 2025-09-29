@@ -14,23 +14,21 @@ enum ROLE {
   OWNER
   ADMIN
 }
-enum EntryExitType {
-  ENTRY
-  EXIT
-}
 
-model Tenant {
+model Condominium {
   id        Int      @id @default(autoincrement())
   name      String
   address   String
+  cnpj      String   @unique
+  contact   String
+  email     String   @unique
+  phone     String
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   users     User[]
-  entryExits EntryExit[]
-  residents  Resident[]
-
-  Visit Visit[]
+  residents Resident[]
 }
 
 model User {
@@ -40,14 +38,13 @@ model User {
   role      ROLE     @default(RESIDENT)
 
   firstAccess Boolean  @default(true)
-
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   personId  Int
-  tenantId  Int
+  condominiumId  Int
   person    Person   @relation(fields: [personId], references: [id])
-  tenant    Tenant   @relation(fields: [tenantId], references: [id])
+  condominium    Condominium   @relation(fields: [condominiumId], references: [id])
 }
 
 model Person {
@@ -55,9 +52,10 @@ model Person {
   name      String
   cpf       String @unique
   phone     String
+  contact   String
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-
   users     User[]
   residents Resident[]
 }
@@ -65,53 +63,12 @@ model Person {
 model Resident {
   id        Int      @id @default(autoincrement())
   personId  Int
-  tenantId  Int
+  condominiumId  Int
   apartment String
   block     String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   person    Person   @relation(fields: [personId], references: [id])
-  tenant    Tenant   @relation(fields: [tenantId], references: [id])
-
-  entryExit EntryExit[]
-
-  Visit Visit[]
-}
-
-model EntryExit {
-  id          Int      @id @default(autoincrement())
-  residentId  Int
-  tenantId    Int
-  type        EntryExitType
-  createdAt   DateTime @default(now())
-
-  resident    Resident @relation(fields: [residentId], references: [id])
-  tenant      Tenant   @relation(fields: [tenantId], references: [id])
-}
-
-model Visitor {
-  id        Int      @id @default(autoincrement())
-  name      String
-  cpf       String
-  phone     String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  visits    Visit[]
-}
-
-model Visit {
-  id          Int      @id @default(autoincrement())
-  visitorId   Int
-  residentId  Int
-  tenantId    Int
-  entryTime   DateTime @default(now())
-  exitTime    DateTime?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  visitor     Visitor  @relation(fields: [visitorId], references: [id])
-  resident    Resident @relation(fields: [residentId], references: [id])
-  tenant      Tenant   @relation(fields: [tenantId], references: [id])
+  condominium    Condominium   @relation(fields: [condominiumId], references: [id])
 }

@@ -13,7 +13,7 @@ declare global {
   namespace Express {
     interface Request {
       user?: AuthUser | null;
-      tenantId?: number;
+      condominiumId?: number;
     }
   }
 }
@@ -32,7 +32,7 @@ const UserMiddleware = (req: Request, res: Response, next: NextFunction) => {
 
     var user = (decoded as any).user;
     req.user = user;
-    req.tenantId = user.tenantId;
+    req.condominiumId = user.condominiumId;
     next();
   });
 };
