@@ -28,6 +28,9 @@ model Tenant {
 
   users     User[]
   entryExits EntryExit[]
+  residents  Resident[]
+
+  Visit Visit[]
 }
 
 model User {
@@ -56,17 +59,59 @@ model Person {
   updatedAt DateTime @updatedAt
 
   users     User[]
-  entryExits EntryExit[]
+  residents Resident[]
 }
 
-//controle de entrada e saida
+model Resident {
+  id        Int      @id @default(autoincrement())
+  personId  Int
+  tenantId  Int
+  apartment String
+  block     String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  person    Person   @relation(fields: [personId], references: [id])
+  tenant    Tenant   @relation(fields: [tenantId], references: [id])
+
+  entryExit EntryExit[]
+
+  Visit Visit[]
+}
+
 model EntryExit {
   id          Int      @id @default(autoincrement())
-  personId    Int
+  residentId  Int
   tenantId    Int
   type        EntryExitType
   createdAt   DateTime @default(now())
 
-  person      Person   @relation(fields: [personId], references: [id])
+  resident    Resident @relation(fields: [residentId], references: [id])
+  tenant      Tenant   @relation(fields: [tenantId], references: [id])
+}
+
+model Visitor {
+  id        Int      @id @default(autoincrement())
+  name      String
+  cpf       String
+  phone     String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  visits    Visit[]
+}
+
+model Visit {
+  id          Int      @id @default(autoincrement())
+  visitorId   Int
+  residentId  Int
+  tenantId    Int
+  entryTime   DateTime @default(now())
+  exitTime    DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  visitor     Visitor  @relation(fields: [visitorId], references: [id])
+  resident    Resident @relation(fields: [residentId], references: [id])
   tenant      Tenant   @relation(fields: [tenantId], references: [id])
 }

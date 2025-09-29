@@ -1,10 +1,7 @@
 import { Request, Response } from "express";
-import { z } from "zod";
-import * as bcrypt from "bcryptjs";
-import PersonModel from "../models/personModel";
-import UserModel from "../models/userModel";
-import { ROLE } from "@prisma/client";
 import { error } from "console";
+import { z } from "zod";
+import PersonModel from "../models/personModel";
 
 const createPersonSchema = z.object({
   name: z.string().min(1),
@@ -44,7 +41,7 @@ const PersonController = {
         .status(500)
         .json({ result: false, message: "Internal server error", error });
     }
-  },
+  }
 };
 
 export default PersonController;
