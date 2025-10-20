@@ -3,16 +3,15 @@ import { prisma } from "../lib/prisma";
 
 const UserModel = {
   async create(data: {
-    email: string;
+    username: string;
     password: string;
-    role: ROLE | undefined;
-    personId: number;
+    role?: ROLE;
     condominiumId: number;
   }) {
     return await prisma.user.create({ data });
   },
-  async findByEmail(email: string) {
-    return await prisma.user.findUnique({ where: { email } });
+  async findByUsername(username: string) {
+    return await prisma.user.findUnique({ where: { username } });
   },
   async findById(id: number) {
     return await prisma.user.findUnique({ where: { id } });

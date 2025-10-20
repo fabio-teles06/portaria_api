@@ -29,11 +29,13 @@ model Condominium {
 
   users     User[]
   residents Resident[]
+
+  Apartment Apartment[]
 }
 
 model User {
   id        Int      @id @default(autoincrement())
-  email     String   @unique
+  username  String   @unique
   password  String
   role      ROLE     @default(RESIDENT)
 
@@ -41,34 +43,61 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  personId  Int
   condominiumId  Int
-  person    Person   @relation(fields: [personId], references: [id])
   condominium    Condominium   @relation(fields: [condominiumId], references: [id])
-}
 
-model Person {
-  id        Int      @id @default(autoincrement())
-  name      String
-  cpf       String @unique
-  phone     String
-  contact   String
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  users     User[]
-  residents Resident[]
+  Resident Resident[]
 }
 
 model Resident {
   id        Int      @id @default(autoincrement())
-  personId  Int
   condominiumId  Int
-  apartment String
+  apartmentId    Int
+  
+  name      String
+  cpf       String   @unique
+
+  userId    Int      @unique
+  user      User     @relation(fields: [userId], references: [id])
+
+  condominium    Condominium   @relation(fields: [condominiumId], references: [id])
+  apartment      Apartment     @relation(fields: [apartmentId], references: [id])
+  Delivery Delivery[]
+}
+
+model Apartment {
+  id        Int      @id @default(autoincrement())
+  number    String
   block     String
+  condominiumId  Int
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  person    Person   @relation(fields: [personId], references: [id])
   condominium    Condominium   @relation(fields: [condominiumId], references: [id])
+
+  Resident Resident[]
+}
+
+model Delivery {
+  id          Int      @id @default(autoincrement())
+  description String
+  enterprise  String
+  deliveryCode String
+
+  createdAt   DateTime @default(now())
+  deliveredAt  DateTime?
+  residentId  Int
+  status      String   @default("PENDING")
+
+  resident    Resident @relation(fields: [residentId], references: [id])
+}
+
+model Visitor {
+  id          Int      @id @default(autoincrement())
+  name        String
+  cpf         String   @unique
+
+  visitDate   DateTime
+  exitTime    DateTime?
 }
