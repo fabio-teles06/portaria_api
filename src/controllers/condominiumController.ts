@@ -1,29 +1,35 @@
-import CondominiumModel from "../models/condominiumModel";
 import { Request, Response } from "express";
-import z from "zod";
+import prisma from "../lib/prisma";
 
-const createCondominiumSchema = z.object({
-  name: z.string().min(1, "Name of condominium is required"),
-  address: z.string().min(1, "Address is required"),
-  cnpj: z.string().min(1, "CNPJ is required"),
-  contact: z.string().min(1, "Contact is required"),
-  email: z.email("Invalid email address"),
-  phone: z.string().min(1, "Phone number is required"),
-});
+async function createCondominium(req: Request, res: Response) {
+  const {
+    name,
+    address,
+  }: {
+    name: string;
+    address: string;
+  } = req.body;
 
-const CondominiumController = {
-  create: async (req: Request, res: Response) => {
-    try {
-      const parsedData = createCondominiumSchema.parse(req.body);
-      const condominium = await CondominiumModel.create(parsedData);
-      res.status(201).json(condominium);
-    } catch (error) {
-      if (error instanceof z.ZodError) {
-        return res.status(400).json({ errors: error.issues });
-      }
-      res.status(500).json({ error: "Internal server error" });
-    }
-  },
-};
+  try {
+    const condominium = await prisma.condominium.create({
+      data: {
+        name,
+        address,
+      },
+    });
+    res.status(201).json(condominium);
+  } catch (error) {
+    res.status(500).json({ error: "Failed to create condominium" });
+  }
+}
 
-export default CondominiumController;
+async function getCondominiums(req: Request, res: Response) {
+  try {
+    const condominiums = await prisma.condominium.findMany();
+    res.status(200).json(condominiums);
+  } catch (error) {
+    res.status(500).json({ error: "Failed to fetch condominiums" });
+  }
+}
+
+export { createCondominium, getCondominiums };

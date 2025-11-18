@@ -1,5 +1,5 @@
 datasource db {
-  provider = "postgresql" // ou "postgresql" / "mysql"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
@@ -7,97 +7,89 @@ generator client {
   provider = "prisma-client-js"
 }
 
-enum ROLE {
-  RESIDENT
-  DOORMAN
-  MANAGER
-  OWNER
+enum UserRole {
   ADMIN
+  SINDICO
+  PORTEIRO
+  MORADOR
+}
+
+enum PackageType {
+  DELIVERY
+  ENCOMENDA
+}
+
+enum VisitStatus {
+  AGENDADA
+  EM_ANDAMENTO
+  FINALIZADA
+  CANCELADA
+}
+
+model User {
+  id            Int      @id @default(autoincrement())
+  name          String
+  email         String   @unique
+  password      String
+  role          UserRole
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  condominiumId Int
+
+  packages    Package[]
+  visits      Visit[]
+  residents   Resident[]
+  condominium Condominium @relation(fields: [condominiumId], references: [id])
+}
+
+model Package {
+  id          Int         @id @default(autoincrement())
+  type        PackageType
+  receiveCode String?
+  description String
+  receivedAt  DateTime    @default(now())
+  userId      Int
+  user        User        @relation(fields: [userId], references: [id])
+}
+
+model Visit {
+  id           Int         @id @default(autoincrement())
+  visitorName  String
+  vehiclePlate String?
+  status       VisitStatus @default(AGENDADA)
+  scheduledAt  DateTime
+  userId       Int
+  user         User        @relation(fields: [userId], references: [id])
 }
 
 model Condominium {
   id        Int      @id @default(autoincrement())
   name      String
   address   String
-  cnpj      String   @unique
-  contact   String
-  email     String   @unique
-  phone     String
-
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  users     User[]
-  residents Resident[]
+  apartments Apartment[]
 
-  Apartment Apartment[]
-}
-
-model User {
-  id        Int      @id @default(autoincrement())
-  username  String   @unique
-  password  String
-  role      ROLE     @default(RESIDENT)
-
-  firstAccess Boolean  @default(true)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  condominiumId  Int
-  condominium    Condominium   @relation(fields: [condominiumId], references: [id])
-
-  Resident Resident[]
-}
-
-model Resident {
-  id        Int      @id @default(autoincrement())
-  condominiumId  Int
-  apartmentId    Int
-  
-  name      String
-  cpf       String   @unique
-
-  userId    Int      @unique
-  user      User     @relation(fields: [userId], references: [id])
-
-  condominium    Condominium   @relation(fields: [condominiumId], references: [id])
-  apartment      Apartment     @relation(fields: [apartmentId], references: [id])
-  Delivery Delivery[]
+  users User[]
 }
 
 model Apartment {
-  id        Int      @id @default(autoincrement())
-  number    String
-  block     String
-  condominiumId  Int
+  id            Int         @id @default(autoincrement())
+  number        String
+  residentName  String
+  condominiumId Int
+  condominium   Condominium @relation(fields: [condominiumId], references: [id])
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  condominium    Condominium   @relation(fields: [condominiumId], references: [id])
-
-  Resident Resident[]
+  residents Resident[]
 }
 
-model Delivery {
-  id          Int      @id @default(autoincrement())
-  description String
-  enterprise  String
-  deliveryCode String
+model Resident {
+  id          Int       @id @default(autoincrement())
+  userId      Int
+  apartmentId Int
+  user        User      @relation(fields: [userId], references: [id])
+  apartment   Apartment @relation(fields: [apartmentId], references: [id])
 
-  createdAt   DateTime @default(now())
-  deliveredAt  DateTime?
-  residentId  Int
-  status      String   @default("PENDING")
-
-  resident    Resident @relation(fields: [residentId], references: [id])
-}
-
-model Visitor {
-  id          Int      @id @default(autoincrement())
-  name        String
-  cpf         String   @unique
-
-  visitDate   DateTime
-  exitTime    DateTime?
+  @@unique([userId, apartmentId])
 }
